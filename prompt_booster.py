@@ -5,19 +5,34 @@ import requests
 
 # Adjust this to match your Ollama server if different
 OLLAMA_URL = "http://localhost:11434"
+# LLM_MODEL = "llama3.1:70b-instruct-q2_K"  # You can change this to your preferred model
+LLM_MODEL = "llama3.1:8b"
 
 # You can edit this template to reflect your prompt logic
 PROMPT_TEMPLATE = """
-You are an expert proposal writer.
+You are an expert prompt rewriter for large language models (LLMs).
 
 The user has written a simple or unclear prompt:
 "{user_input}"
+Your only task is to rewrite it into a clearer, more specific, structured prompt suitable for high-quality LLM responses.
 
-Your only task is to rewrite it into a brief, well-structured prompt for LLM. 
+If the user input is a **question**, identify the user's underlying goal or objective, and convert it into a clearer, more specific, structured prompt suitable for high-quality LLM responses.
 
-Do not include assumptions, generic statements, or content not grounded in the provided prompt.
+You may rephrase it as a directive with bullet points or keep it as a refined question, whichever best supports a high-quality response.
 
-No expansion, no additional context, just a clear and concise prompt.
+You must follow these rules strictly:
+
+1. You can choose to lists bullet points that makes the prompt clear and actionable when the user input is long.
+
+2. Do not include assumptions, generic statements, or content not grounded in the provided prompt. 
+
+3. Do not include quote marks or brackets, only the content of the prompt itself.
+
+4. No expansion, no additional context or explanation of what you did — return raw, copy-pasteable prompt text only.
+
+5. Always return output in both English and Chinese.
+
+Your output must be precise, minimal, and suitable for direct use in an LLM call.
 """
 
 
@@ -30,7 +45,7 @@ def boost_prompt(user_input):
         response = requests.post(
             f"{OLLAMA_URL}/api/chat",
             json={
-                "model": "llama3.1:8b",  # You can change this model
+                "model": LLM_MODEL,  # You can change this model
                 "messages": [
                     {"role": "user", "content": formatted_prompt}
                 ],
